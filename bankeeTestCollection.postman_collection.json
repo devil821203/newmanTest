@@ -1,0 +1,178 @@
+{
+	"info": {
+		"_postman_id": "0c647ee3-e637-4ffb-98e5-af91ae514a34",
+		"name": "bankeeTestCollection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "19584363"
+	},
+	"item": [
+		{
+			"name": "preLoad",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var CryptoJS = require(\"crypto-js\")//導入crypto-js套件 用於解碼\r",
+							"console.log(responseBody);\r",
+							"let res=JSON.parse(responseBody);\r",
+							"console.log(res);\r",
+							"var token =res.jwtToken;  //在请求头中获取token\r",
+							"console.log(token);\r",
+							"let strings = token.split(\".\"); //截取token，获取载体\r",
+							"\r",
+							"var jwtheader =CryptoJS.enc.Base64.parse(strings[0]).toString(CryptoJS.enc.Utf8); \r",
+							"var userinfo = CryptoJS.enc.Base64.parse(strings[1]).toString(CryptoJS.enc.Utf8); \r",
+							"console.log(jwtheader);\r",
+							"console.log(userinfo);\r",
+							"pm.environment.set(\"token\", token);\r",
+							"pm.environment.set(\"header\", jwtheader);\r",
+							"pm.environment.set(\"payload\", userinfo);\r",
+							"\r",
+							"pm.test(\"連線成功\",function(){\r",
+							"    pm.expect(pm.response.to.have.status(200));\r",
+							"})\r",
+							"pm.test(\"取得token\",function(){\r",
+							"    let header=JSON.parse(jwtheader)\r",
+							"    pm.expect(token).to.have.exist;\r",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept-Charset",
+						"value": "UTF-8",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"protected\": \"eyJlbmMiOiJBMTI4Q0JDLUhTMjU2In0=\",\n    \"unprotected\": {},\n    \"recipients\": [\n        {\n            \"header\": {\n                \"alg\": \"RSA-OAEP-256\"\n            },\n            \"encrypted_key\": \"XNIXKx5kYea7/diUw6FgeTyXmD2KDDSO4By2TTpTwyWVkiuc0ZZUUyxDI6IPFnqlyJ3IvxHO5z1LzgvBUeRWvmLCIuen9AwilQk/JviKjIor9JQRGlLrfx2iuOS4f8/M8acIfASdg9dEU7E1K6PQ1anyyKoQTYVxwPmcuEszAf4pvfF2ffrlrXozKiOgBpDTkR1Dng6yNU7UZ2NlyL6J/nsU01GN1ZzYJVvqBJLNMumrrAwoFCIPs1bKfP7EgKHsT/Cn/E9GIpxbELI1SfkIybPtqAavZEVqrDX+9LNUHO8x1u78mIz/GG09mIjvgz1dqQv28gZLYNXZseKfz5l19w==\"\n        }\n    ],\n    \"iv\": \"eyFTVv/REG3dES2GFp7ypQ==\",\n    \"ciphertext\": \"vdS7uuWcLwNKRUuOC6/MTCTnUTuWNfYvdaGmC2jufHfO9zZpCSwvjb6AVanf9wsbnuT8juUYNpiDfVTogCHoMzFUGx4Ul3xBOnZgO6p6d/PKDuYCdK3/dKPzfxDmgDWRV4BF99cowDOMH8h/a6GMxYH+4V0til+yMPPXOSOt2okHYYqUmBMziuWZrsQYhCGjlgIephFUcSE6O8VgsMvQ3xRL+HQoznYyOYReTQ6DkaalGmzN1J3ntuiko3Q+CJFnPpM4Z/WYzvOJUbv0PssOtl8OTqJZ1hisioXghU1Eg4fXmbB35cFcw5jMJfqvWTvDAVWq85Y9je0a30VdWdZXGlR4hthyX/pvnVMTzLkgorO1ZnXRrlvXeJFqQohQfs3bblymA6LAMiYijTS/D/kP2Dp9fPlfnxS5kL3Yo7FnjqAotDVQa3+QG5Nq05cpMxv6Qa4EF2KjJVEA7ftYfCQbnPkFkulPwTYQoAS6RyN2/0+z5+N0oUTCUrzYrTDram8ova6Lga4M3JGOElKMPUn22t6/OPEIps2ibBjxGG0QL2DrGI/B2GWUH50ILjs1lHxUydoIxgrFH+QJf3cCJ1DmCgsTF6B6A6I2hoUCGMzGyRm52Dvp0ylOnTpcv8xx8NZMRboq70+ZFXrJlZBpAb6ZMyGlg6lpiEx76zTwKAuMzqvwJkbbStCZOk9jpj7Vss3h77+GTFFTNtFFqdsMdVPKJ5XHVePTB+Iu7PpqyJg3AriG41fUW/xVM8EAxmCw02cs9JzhKEkoOzio4Hstw88WGyQ4nN4XDlz/Pc9nMQWg7g88HRkVvR0wxycNXIhiUDAr1Rj3dfIdXzUBcqerQdnwGqqPC73LhXNp2nWlPxR4tSZdpjEkNrbdgQgy6E7l43sD\",\n    \"tag\": \"\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/{{prefix}}api/v1/preload",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"{{prefix}}api",
+						"v1",
+						"preload"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var CryptoJS = require(\"crypto-js\")//導入crypto-js套件 用於解碼\r",
+							"\r",
+							"let res=JSON.parse(responseBody);\r",
+							"var token =res.jwtToken;  //在请求头中获取token\r",
+							"let strings = token.split(\".\"); //截取token，获取载体\r",
+							"\r",
+							"var jwtheader =CryptoJS.enc.Base64.parse(strings[0]).toString(CryptoJS.enc.Utf8); \r",
+							"var userinfo = CryptoJS.enc.Base64.parse(strings[1]).toString(CryptoJS.enc.Utf8); \r",
+							"pm.environment.set(\"token\", token);\r",
+							"pm.environment.set(\"header\", jwtheader);\r",
+							"pm.environment.set(\"payload\", userinfo);\r",
+							"\r",
+							"pm.test(\"連線成功(200)\",function(){\r",
+							"    pm.expect(pm.response.to.have.status(200));\r",
+							"})\r",
+							"pm.test(\"取得token\",function(){\r",
+							"    let header=JSON.parse(jwtheader)\r",
+							"    pm.expect(token).to.have.exist;\r",
+							"})\r",
+							"pm.test(\"custId 為M197799277\",function(){\r",
+							"    let payload=JSON.parse(userinfo)\r",
+							"    pm.expect(payload[\"jwt.payload\"].custId).to.eql(\"M197799277\")\r",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept-Charset",
+						"value": "UTF-8",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"protected\": \"eyJlbmMiOiJBMTI4Q0JDLUhTMjU2In0=\",\n    \"unprotected\": {},\n     \"recipients\": [{\"header\": {\"alg\": \"RSA-OAEP-256\"}, \"encrypted_key\": \"gjsnHy9jL/S/f8UinucTg6esySmaGw+gaaFL0YaAixboxtZdrqWi6E6phIeCoMrVr8u3XgYLPnhCXIEd90mj91qtdhynV9BD9K1ZbHR6+dQJBpu21H43QaITfiXIWEeG6rWGoveYifpkQPGNhWkFTPxZoqgoUOQ27sJ8faJyYQa5c0R35Yj/Laz2mBZQBu7gkK9g+LFWh+R1GuWHqzwQbHDu9ClaaWa3VRFDSZn2Lddzm8cXOLUHNmWztnjX1MK27LkxrsYOUMkq6v8om40IyaKqY8JnpWW+8N+ghhrWSfQ1rlW/QiuATHNYnaAu92oqFKVWEceQ2Ipc8H832oTHBw==\"}],\n    \"iv\": \"eyFTVv/REG3dES2GFp7ypQ==\",\n    \"ciphertext\": \"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\",\n    \"tag\": \"\"\n    \n    \n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/{{prefix}}api/v1/login",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"{{prefix}}api",
+						"v1",
+						"login"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
